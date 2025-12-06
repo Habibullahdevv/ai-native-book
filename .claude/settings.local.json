@@ -19,7 +19,12 @@
       "Bash(claude mcp add:*)",
       "Bash(npm install)",
       "Bash(npm run build)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "Bash(GIT_USER=Habibullahdevv USE_SSH=false npm run deploy:*)"
     ],
     "deny": [],
     "ask": []
