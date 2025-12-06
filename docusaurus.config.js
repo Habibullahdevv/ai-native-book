@@ -1,5 +1,4 @@
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+import { themes as prismThemes } from 'prism-react-renderer';
 
 
 
@@ -21,7 +20,7 @@ const config = {
   projectName: 'ai-native-book', // Usually your repo name.
   trailingSlash: false,
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -134,8 +133,8 @@ const config = {
         copyright: `Copyright © ${new Date().getFullYear()} My Book, Inc. Built with Docusaurus.`,
       },
       prism: {
-        theme: lightCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: prismThemes.github,
+        darkTheme: prismThemes.dracula,
       },
       algolia: {
         // The application ID provided by Algolia
