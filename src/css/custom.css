@@ -1,0 +1,33 @@
+/**
+ * Any CSS here will be applied to all pages by default.
+ * You can add your custom CSS rules here and override the ones from Docusaurus.
+ *
+ * For a detailed explanation regarding the CSS modules and Sass
+ * configuration, please refer to the Docusaurus documentation.
+ *
+ * @see https://docusaurus.io/docs/styling-layout/#changing-the-main-colors
+ */
+
+/* For readability concerns, you should modify the Docusaurus color values. */
+:root {
+  --ifm-color-primary: #25c2a0;
+  --ifm-color-primary-dark: #21af90;
+  --ifm-color-primary-darker: #1fa588;
+  --ifm-color-primary-darkest: #1a8870;
+  --ifm-color-primary-light: #29d5b0;
+  --ifm-color-primary-lighter: #32d8b4;
+  --ifm-color-primary-lightest: #4fddbf;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+/* For information on how to create a dark theme, please refer to the Docusaurus documentation. */
+[data-theme='dark'] {
+  --ifm-color-primary: #25c2a0;
+  --ifm-color-primary-dark: #21af90;
+  --ifm-color-primary-darker: #1fa588;
+  --ifm-color-primary-darkest: #1a8870;
+  --ifm-color-primary-light: #29d5b0;
+  --ifm-color-primary-lighter: #32d8b4;
+  --ifm-color-primary-lightest: #4fddbf;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}

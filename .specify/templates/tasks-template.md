@@ -12,6 +12,8 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+**Constitution Alignment**: All tasks MUST adhere to the principles and standards outlined in the project constitution (`.specify/memory/constitution.md`), especially regarding scientific accuracy, reproducibility, and verification of code, simulations, and diagrams.
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)

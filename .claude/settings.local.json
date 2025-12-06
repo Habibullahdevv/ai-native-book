@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.specify/scripts/bash/create-phr.sh:*)",
+      "Bash(git fetch:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(git checkout:*)",
+      "Bash(mkdir:*)",
+      "Bash(.specify/scripts/powershell/check-prerequisites.ps1:*)",
+      "Bash(powershell.exe:*)",
+      "Bash(.specify/scripts/powershell/setup-plan.ps1:*)",
+      "Bash(ls:*)",
+      "Bash(.specify/scripts/powershell/create-new-feature.ps1:*)",
+      "Bash(git rev-parse:*)",
+      "WebSearch",
+      "SlashCommand(/sp.tasks module-2)",
+      "Bash(bash -c \".specify/scripts/bash/create-phr.sh --title \"\"Module 2 Digital Twin Specification Complete\"\" --stage spec --feature \"\"001-add-module-2\"\" --json\")",
+      "Bash(bash -c:*)",
+      "Bash(claude mcp add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
