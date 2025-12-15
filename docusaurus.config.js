@@ -140,9 +140,12 @@ const config = {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,
       },
-      algolia: {
-        // The application ID provided by Algolia
-      },
+      // Algolia DocSearch - commented out until API credentials are configured
+      // algolia: {
+      //   appId: 'YOUR_APP_ID',
+      //   apiKey: 'YOUR_API_KEY',
+      //   indexName: 'ai-native-book',
+      // },
     }),
 };
 
