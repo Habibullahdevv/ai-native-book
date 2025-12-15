@@ -1,0 +1,23 @@
+{
+  "id": "module-1 copy/chapter-4",
+  "title": "Chapter 4: Actuation and Control Systems",
+  "description": "Actuation and control systems are the muscle and nervous system of a robot, respectively, translating abstract computational commands into physical motion and ensuring these motions are executed precisely, stably, and safely. Actuators are the components responsible for generating motion or force, while control systems provide the intelligence to regulate these actuators, allowing the robot to perform its intended tasks in a coordinated and effective manner.",
+  "source": "@site/docs/module-1 copy/chapter-4.md",
+  "sourceDirName": "module-1 copy",
+  "slug": "/module-1 copy/chapter-4",
+  "permalink": "/ai-native-book/docs/module-1 copy/chapter-4",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Chapter 3: Sensing and Perception for Robotics",
+    "permalink": "/ai-native-book/docs/module-1 copy/chapter-3"
+  },
+  "next": {
+    "title": "Chapter 5: Introduction to Robot Operating System (ROS)",
+    "permalink": "/ai-native-book/docs/module-1 copy/chapter-5"
+  }
+}

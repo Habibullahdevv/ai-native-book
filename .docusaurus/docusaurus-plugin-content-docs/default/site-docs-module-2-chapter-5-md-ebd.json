@@ -1,0 +1,23 @@
+{
+  "id": "module2/chapter5",
+  "title": "Chapter 5: Real-world Humanoid Walking Systems",
+  "description": "5.1 Introduction to Humanoid Robotics Platforms",
+  "source": "@site/docs/module2/chapter5.md",
+  "sourceDirName": "module2",
+  "slug": "/module2/chapter5",
+  "permalink": "/ai-native-book/docs/module2/chapter5",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Chapter 4: Locomotion Planning and Stability Margins",
+    "permalink": "/ai-native-book/docs/module2/chapter4"
+  },
+  "next": {
+    "title": "Module 3: Perception and Intelligence in Physical AI Systems",
+    "permalink": "/ai-native-book/docs/module3/"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "module4/chapter2",
+  "title": "Voice & Gesture Interfaces",
+  "description": "Natural and intuitive communication is paramount for seamless human-robot interaction. Voice and gesture interfaces offer powerful modalities for humans to convey commands, intentions, and feedback to robots, moving beyond cumbersome graphical user interfaces or complex programming. This chapter explores the design and implementation of voice and gesture recognition systems for humanoid robots, emphasizing their integration into a cohesive Vision-Language-Action (VLA) pipeline.",
+  "source": "@site/docs/module4/chapter2.md",
+  "sourceDirName": "module4",
+  "slug": "/module4/chapter2",
+  "permalink": "/ai-native-book/docs/module4/chapter2",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Human-Robot Interaction Models",
+    "permalink": "/ai-native-book/docs/module4/chapter1"
+  },
+  "next": {
+    "title": "Social Robotics & Safety Engineering",
+    "permalink": "/ai-native-book/docs/module4/chapter3"
+  }
+}

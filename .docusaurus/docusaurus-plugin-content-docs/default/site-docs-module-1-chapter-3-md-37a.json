@@ -1,0 +1,23 @@
+{
+  "id": "module-1/chapter-3",
+  "title": "Chapter 3: Sensing and Perception for Robotics",
+  "description": "For a physical AI system to interact intelligently and autonomously with its environment, it must first be able to perceive it accurately and robustly. Sensing and perception are the robot's fundamental gateways to understanding the world around it, its own state, and the presence and behavior of other agents. This process involves two main stages: sensing, which converts physical phenomena into measurable electrical signals, and perception, which interprets these signals to construct a meaningful, actionable representation of the environment. The quality and reliability of these perceptions directly impact a robot's ability to make informed decisions, plan movements, and execute tasks effectively.",
+  "source": "@site/docs/module-1/chapter-3.md",
+  "sourceDirName": "module-1",
+  "slug": "/module-1/chapter-3",
+  "permalink": "/ai-native-book/docs/module-1/chapter-3",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Chapter 2: Robot Kinematics and Dynamics",
+    "permalink": "/ai-native-book/docs/module-1/chapter-2"
+  },
+  "next": {
+    "title": "Chapter 4: Actuation and Control Systems",
+    "permalink": "/ai-native-book/docs/module-1/chapter-4"
+  }
+}

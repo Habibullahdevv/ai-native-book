@@ -1,0 +1,23 @@
+{
+  "id": "module3/chapter3",
+  "title": "SLAM & Spatial Understanding",
+  "description": "Simultaneous Localization and Mapping (SLAM) is a fundamental problem in robotics, enabling a robot to build a map of an unknown environment while simultaneously tracking its own pose (position and orientation) within that map. For AI-powered robots, especially humanoids, robust SLAM and spatial understanding are critical for autonomous navigation, interaction, and task execution. This chapter explores various SLAM techniques and how they contribute to a robot's spatial awareness, with a focus on NVIDIA Isaac ROS integration.",
+  "source": "@site/docs/module3/chapter3.md",
+  "sourceDirName": "module3",
+  "slug": "/module3/chapter3",
+  "permalink": "/ai-native-book/docs/module3/chapter3",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Multimodal Sensing Fusion",
+    "permalink": "/ai-native-book/docs/module3/chapter2"
+  },
+  "next": {
+    "title": "Sensor Calibration",
+    "permalink": "/ai-native-book/docs/module3/chapter4"
+  }
+}

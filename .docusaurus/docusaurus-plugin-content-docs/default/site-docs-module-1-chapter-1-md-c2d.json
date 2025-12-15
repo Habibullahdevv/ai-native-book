@@ -1,0 +1,23 @@
+{
+  "id": "module-1/chapter-1",
+  "title": "Chapter 1: Introduction to Physical AI and Robotics",
+  "description": "The field of robotics has undergone a dramatic transformation, moving from pre-programmed industrial arms to sophisticated autonomous agents capable of learning and adapting. This evolution is largely driven by the integration of Artificial Intelligence (AI), giving rise to what we term \"Physical AI.\" Physical AI refers to intelligent systems that can perceive their environment, make decisions, and execute actions within the physical world, often through embodied forms like robots. This capability extends beyond mere automation; it involves true cognitive functions that allow machines to interact intelligently and flexibly with complex, unstructured environments. This introductory chapter lays the groundwork by defining key terms, tracing historical developments, and outlining the interdisciplinary nature of this rapidly advancing field.",
+  "source": "@site/docs/module-1/chapter-1.md",
+  "sourceDirName": "module-1",
+  "slug": "/module-1/chapter-1",
+  "permalink": "/ai-native-book/docs/module-1/chapter-1",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Module 1: Foundations of Physical AI",
+    "permalink": "/ai-native-book/docs/module-1/"
+  },
+  "next": {
+    "title": "Chapter 2: Robot Kinematics and Dynamics",
+    "permalink": "/ai-native-book/docs/module-1/chapter-2"
+  }
+}

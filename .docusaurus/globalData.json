@@ -1,0 +1,153 @@
+{
+  "docusaurus-plugin-content-docs": {
+    "default": {
+      "path": "/ai-native-book/docs",
+      "versions": [
+        {
+          "name": "current",
+          "label": "Next",
+          "isLast": true,
+          "path": "/ai-native-book/docs",
+          "mainDocId": "intro",
+          "docs": [
+            {
+              "id": "intro",
+              "path": "/ai-native-book/docs/intro",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module-1/chapter-1",
+              "path": "/ai-native-book/docs/module-1/chapter-1",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module-1/chapter-2",
+              "path": "/ai-native-book/docs/module-1/chapter-2",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module-1/chapter-3",
+              "path": "/ai-native-book/docs/module-1/chapter-3",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module-1/chapter-4",
+              "path": "/ai-native-book/docs/module-1/chapter-4",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module-1/chapter-5",
+              "path": "/ai-native-book/docs/module-1/chapter-5",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module-1/index",
+              "path": "/ai-native-book/docs/module-1/",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module2/chapter1",
+              "path": "/ai-native-book/docs/module2/chapter1",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module2/chapter2",
+              "path": "/ai-native-book/docs/module2/chapter2",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module2/chapter3",
+              "path": "/ai-native-book/docs/module2/chapter3",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module2/chapter4",
+              "path": "/ai-native-book/docs/module2/chapter4",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module2/chapter5",
+              "path": "/ai-native-book/docs/module2/chapter5",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module2/index",
+              "path": "/ai-native-book/docs/module2/",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module3/chapter1",
+              "path": "/ai-native-book/docs/module3/chapter1",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module3/chapter2",
+              "path": "/ai-native-book/docs/module3/chapter2",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module3/chapter3",
+              "path": "/ai-native-book/docs/module3/chapter3",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module3/chapter4",
+              "path": "/ai-native-book/docs/module3/chapter4",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module3/chapter5",
+              "path": "/ai-native-book/docs/module3/chapter5",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module3/index",
+              "path": "/ai-native-book/docs/module3/",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module4/chapter1",
+              "path": "/ai-native-book/docs/module4/chapter1",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module4/chapter2",
+              "path": "/ai-native-book/docs/module4/chapter2",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module4/chapter3",
+              "path": "/ai-native-book/docs/module4/chapter3",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module4/chapter4",
+              "path": "/ai-native-book/docs/module4/chapter4",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module4/chapter5",
+              "path": "/ai-native-book/docs/module4/chapter5",
+              "sidebar": "tutorialSidebar"
+            },
+            {
+              "id": "module4/index",
+              "path": "/ai-native-book/docs/module4/",
+              "sidebar": "tutorialSidebar"
+            }
+          ],
+          "draftIds": [],
+          "sidebars": {
+            "tutorialSidebar": {
+              "link": {
+                "path": "/ai-native-book/docs/intro",
+                "label": "intro"
+              }
+            }
+          }
+        }
+      ],
+      "breadcrumbs": true
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "module3/index",
+  "title": "Module 3: Perception and Intelligence in Physical AI Systems",
+  "description": "Overview",
+  "source": "@site/docs/module3/index.md",
+  "sourceDirName": "module3",
+  "slug": "/module3/",
+  "permalink": "/ai-native-book/docs/module3/",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Chapter 5: Real-world Humanoid Walking Systems",
+    "permalink": "/ai-native-book/docs/module2/chapter5"
+  },
+  "next": {
+    "title": "Computer Vision in Robotics",
+    "permalink": "/ai-native-book/docs/module3/chapter1"
+  }
+}

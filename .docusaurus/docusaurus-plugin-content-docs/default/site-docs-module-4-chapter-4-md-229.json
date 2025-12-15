@@ -1,0 +1,23 @@
+{
+  "id": "module4/chapter4",
+  "title": "Ethical Frameworks in Robotics",
+  "description": "As humanoid robots become increasingly sophisticated and integrated into society, capable of autonomous decision-making and interaction, the need for robust ethical frameworks becomes paramount. These frameworks provide a principled approach to guide the design, development, deployment, and governance of robotic systems, ensuring they align with human values, societal norms, and legal requirements. This chapter explores key ethical principles and established frameworks relevant to robotics and AI.",
+  "source": "@site/docs/module4/chapter4.md",
+  "sourceDirName": "module4",
+  "slug": "/module4/chapter4",
+  "permalink": "/ai-native-book/docs/module4/chapter4",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Social Robotics & Safety Engineering",
+    "permalink": "/ai-native-book/docs/module4/chapter3"
+  },
+  "next": {
+    "title": "Responsible Autonomous Systems",
+    "permalink": "/ai-native-book/docs/module4/chapter5"
+  }
+}

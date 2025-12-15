@@ -1,0 +1,23 @@
+{
+  "id": "module3/chapter4",
+  "title": "Sensor Calibration",
+  "description": "Accurate sensor data is paramount for robust robotic perception, navigation, and manipulation. Before any meaningful data fusion or SLAM can occur, all sensors on a robot must be carefully calibrated. Sensor calibration is the process of determining the intrinsic and extrinsic parameters of each sensor, ensuring that their measurements are accurate and that their spatial relationships to each other and to the robot's body are precisely known. This chapter details essential sensor calibration techniques for common robotic sensors.",
+  "source": "@site/docs/module3/chapter4.md",
+  "sourceDirName": "module3",
+  "slug": "/module3/chapter4",
+  "permalink": "/ai-native-book/docs/module3/chapter4",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "SLAM & Spatial Understanding",
+    "permalink": "/ai-native-book/docs/module3/chapter3"
+  },
+  "next": {
+    "title": "AI Reasoning in Robotics Systems",
+    "permalink": "/ai-native-book/docs/module3/chapter5"
+  }
+}

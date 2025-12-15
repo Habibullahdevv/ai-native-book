@@ -1,0 +1,23 @@
+{
+  "id": "module-1 copy/chapter-2",
+  "title": "Chapter 2: Robot Kinematics and Dynamics",
+  "description": "To effectively control a robot, one must understand its motion capabilities and how forces affect its movement. This is where robot kinematics and dynamics come into play. These two fundamental areas form the mathematical bedrock for designing, simulating, and controlling physical AI systems, enabling them to execute precise motions and interact dynamically with their environment.",
+  "source": "@site/docs/module-1 copy/chapter-2.md",
+  "sourceDirName": "module-1 copy",
+  "slug": "/module-1 copy/chapter-2",
+  "permalink": "/ai-native-book/docs/module-1 copy/chapter-2",
+  "draft": false,
+  "unlisted": false,
+  "tags": [],
+  "version": "current",
+  "frontMatter": {},
+  "sidebar": "tutorialSidebar",
+  "previous": {
+    "title": "Chapter 1: Introduction to Physical AI and Robotics",
+    "permalink": "/ai-native-book/docs/module-1 copy/chapter-1"
+  },
+  "next": {
+    "title": "Chapter 3: Sensing and Perception for Robotics",
+    "permalink": "/ai-native-book/docs/module-1 copy/chapter-3"
+  }
+}
