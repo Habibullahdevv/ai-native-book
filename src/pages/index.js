@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import HomepageFeatures from '@site/src/components/HomepageFeatures';
 
 import styles from './index.module.css';
 
@@ -17,7 +16,7 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/ai-native-book/docs/intro">
+            to="/docs/intro">
             Welcome to the AI Native Book
           </Link>
         </div>
@@ -26,15 +25,54 @@ function HomepageHeader() {
   );
 }
 
+function FeatureItem({title, description, link}) {
+  return (
+    <div className={clsx('col col--3')}>
+      <div className="text--center padding-horiz--md">
+        <h3>{title}</h3>
+        <p>{description}</p>
+        <Link className="button button--secondary" to={link}>
+          Learn More
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello ${siteConfig.title}`}
-      description="A comprehensive guide to Physical AI and more.">
+      title={`Welcome to ${siteConfig.title}`}
+      description="A comprehensive guide to Physical AI, Humanoid Robotics, and more.">
       <HomepageHeader />
       <main>
-        <HomepageFeatures />
+        <section className={styles.features}>
+          <div className="container">
+            <div className="row">
+              <FeatureItem
+                title="Module 1: Foundations of Physical AI"
+                description="Learn the fundamentals of Physical AI and humanoid robotics."
+                link="/docs/module1"
+              />
+              <FeatureItem
+                title="Module 2: Locomotion & Control"
+                description="Explore human locomotion, balance, and control in humanoid robotics."
+                link="/docs/module2"
+              />
+              <FeatureItem
+                title="Module 3: Perception & Intelligence"
+                description="Discover perception and intelligence in Physical AI systems."
+                link="/docs/module3"
+              />
+              <FeatureItem
+                title="Module 4: HRI, Safety & Ethics"
+                description="Understand human-robot interaction, safety, and ethical considerations."
+                link="/docs/module4"
+              />
+            </div>
+          </div>
+        </section>
       </main>
     </Layout>
   );
