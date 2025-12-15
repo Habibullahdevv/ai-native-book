@@ -4,8 +4,8 @@ import { themes as prismThemes } from 'prism-react-renderer';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'My Book',
-  tagline: 'A comprehensive guide to everything you need to know',
+  title: 'AI Native Book',
+  tagline: 'A comprehensive guide to Physical AI and more.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -39,12 +39,12 @@ const config = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo. For example: alois/docusaurus-ai-native-book
-          // editUrl: 'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: 'https://github.com/Habibullahdevv/ai-native-book/tree/main/',
         },
         blog: {
           showReadingTime: true,
           // Please change this to your repo. For example: alois/docusaurus-ai-native-book
-          // editUrl: 'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
+          editUrl: 'https://github.com/Habibullahdevv/ai-native-book/tree/main/',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -59,7 +59,7 @@ const config = {
       // Replace with your project's social card
       // image: 'img/docusaurus-social-card.jpg',
       navbar: {
-        title: 'My Book',
+        title: 'AI Native Book',
         // logo: {
         //   alt: 'My Site Logo',
         //   src: 'img/logo.svg',
@@ -101,6 +101,10 @@ const config = {
                 label: 'Module 3',
                 to: '/docs/module3',
               },
+              {
+                label: 'Module 4',
+                to: '/docs/module4',
+              },
             ],
           },
           {
@@ -125,7 +129,7 @@ const config = {
             items: [
               {
                 label: 'GitHub',
-                href: 'https://github.com/your-github-username/ai-native-book',
+                href: 'https://github.com/Habibullahdevv/ai-native-book',
               },
             ],
           },
@@ -138,27 +142,6 @@ const config = {
       },
       algolia: {
         // The application ID provided by Algolia
-        appId: 'YOUR_APP_ID',
-
-        // Public API key: it is safe to commit it
-        apiKey: 'YOUR_SEARCH_API_KEY',
-
-        indexName: 'YOUR_INDEX_NAME',
-
-        // Optional: see https://algolia.com/docs/api-reference/api-parameters/facetFilters/
-        facetFilters: ['language:en'],
-
-        // Optional: path for search page that doesn't use Algolia (enable by default)
-        contextualSearch: true,
-
-        // Optional: Algolia search parameters
-        searchParameters: {},
-
-        // Optional: path for search page that doesn't use Algolia (enable by default)
-        placeholder: 'Search documentation',
-
-        // Optional: whether to enable the dark mode in Algolia search box
-        darkMode: true,
       },
     }),
 };
