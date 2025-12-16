@@ -1,5 +1,5 @@
-# Backend Dockerfile for RAG Chatbot API
-FROM python:3.13-slim
+# Hugging Face Spaces Dockerfile for FastAPI backend
+FROM python:3.11-slim
 
 # Set working directory
 WORKDIR /app
@@ -7,8 +7,6 @@ WORKDIR /app
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
-    libpq-dev \
-    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for better caching
@@ -18,15 +16,14 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY . .
+COPY app.py .
 
-# Expose port (Railway uses PORT env var)
-EXPOSE 8000
+# Create non-root user for HF Spaces
+RUN useradd -m -u 1000 user
+USER user
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:${PORT:-8000}/api/health || exit 1
+# Expose port (HF Spaces uses 7860)
+EXPOSE 7860
 
 # Run the application
-# Railway sets PORT env var, default to 8000 for local development
-CMD uvicorn api.main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD ["python", "app.py"]
