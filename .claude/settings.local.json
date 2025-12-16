@@ -28,7 +28,10 @@
       "Bash(powershell -ExecutionPolicy Bypass -File:*)",
       "Bash(cat:*)",
       "Bash(grep:*)",
-      "Bash(CHAT_API_URL=\"https://ai-native-book-api.railway.app\" npm run build:*)"
+      "Bash(CHAT_API_URL=\"https://ai-native-book-api.railway.app\" npm run build:*)",
+      "Bash(node --version)",
+      "Bash(git pull:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
