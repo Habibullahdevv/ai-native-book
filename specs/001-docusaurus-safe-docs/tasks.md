@@ -102,11 +102,11 @@
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Add run_streamed() wrapper in agent_service.py using Runner.run_streamed() in `backend/api/services/agent_service.py`
-- [ ] T030 [US3] Create SSE stream generator function in `backend/api/routes/chat.py`
-- [ ] T031 [US3] Implement GET /api/chat/stream endpoint with StreamingResponse in `backend/api/routes/chat.py`
-- [ ] T032 [US3] Add SSE event types: token, done, error in `backend/api/routes/chat.py`
-- [ ] T033 [US3] Store complete streamed response to database after stream ends in `backend/api/routes/chat.py`
+- [x] T029 [US3] Add run_streamed() wrapper in agent_service.py using Runner.run_streamed() in `backend/api/services/agent_service.py`
+- [x] T030 [US3] Create SSE stream generator function in `backend/api/routes/chat.py`
+- [x] T031 [US3] Implement POST /api/chat/stream endpoint with StreamingResponse in `backend/api/routes/chat.py`
+- [x] T032 [US3] Add SSE event types: token, done, error in `backend/api/routes/chat.py`
+- [x] T033 [US3] Store complete streamed response to database after stream ends in `backend/api/routes/chat.py`
 
 **Checkpoint**: SSE streaming works end-to-end, tokens appear progressively
 
@@ -128,7 +128,7 @@
 - [x] T039 [US4] Add loading spinner and error state handling in `src/components/ChatWidget/ChatWidget.js`
 - [x] T040 [US4] Create Docusaurus client module to inject ChatWidget globally in `src/clientModules/chatWidget.js`
 - [x] T041 [US4] Register clientModule in docusaurus.config.js in `docusaurus.config.js`
-- [ ] T042 [US4] Add environment variable for API URL in `.env.local` (build-time)
+- [x] T042 [US4] Add environment variable for API URL in `.env.local` (build-time)
 
 **Checkpoint**: Chat widget appears on all pages, can send/receive messages
 
@@ -161,10 +161,10 @@
 
 ### Implementation for User Story 6
 
-- [ ] T049 [US6] Implement EventSource client for /api/chat/stream in `src/components/ChatWidget/api.js`
-- [ ] T050 [US6] Update ChatWidget to render streaming tokens progressively in `src/components/ChatWidget/ChatWidget.js`
-- [ ] T051 [US6] Handle SSE error events gracefully in `src/components/ChatWidget/api.js`
-- [ ] T052 [US6] Add streaming indicator (typing dots) during response in `src/components/ChatWidget/ChatMessage.js`
+- [x] T049 [US6] Implement EventSource client for /api/chat/stream in `src/components/ChatWidget/api.js`
+- [x] T050 [US6] Update ChatWidget to render streaming tokens progressively in `src/components/ChatWidget/ChatWidget.js`
+- [x] T051 [US6] Handle SSE error events gracefully in `src/components/ChatWidget/api.js`
+- [x] T052 [US6] Add streaming indicator (typing dots) during response in `src/components/ChatWidget/ChatMessage.js`
 
 **Checkpoint**: Streaming responses render progressively with good UX
 
@@ -175,7 +175,7 @@
 **Purpose**: Production readiness, documentation, deployment
 
 - [x] T053 [P] Create Dockerfile for backend deployment in `backend/Dockerfile`
-- [ ] T054 [P] Create docker-compose.yml for local full-stack testing in `docker-compose.yml`
+- [x] T054 [P] Create docker-compose.yml for local full-stack testing in `docker-compose.yml`
 - [x] T055 [P] Update .gitignore to exclude .env files but include .env.example
 - [x] T056 [P] Add CORS production origin (habibullahdevv.github.io) in `backend/api/main.py`
 - [ ] T057 Run quickstart.md validation: test local setup steps in `specs/001-docusaurus-safe-docs/quickstart.md`

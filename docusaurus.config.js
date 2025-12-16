@@ -23,6 +23,12 @@ const config = {
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
+  // Custom fields for runtime configuration
+  customFields: {
+    // Chat API URL - override via environment variable for production
+    chatApiUrl: process.env.CHAT_API_URL || 'http://localhost:8000',
+  },
+
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
   // may want to replace "en" with "zh-Hans".

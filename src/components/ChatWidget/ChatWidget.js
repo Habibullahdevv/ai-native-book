@@ -4,9 +4,12 @@
  */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './ChatWidget.module.css';
-import ChatMessage, { LoadingIndicator, WelcomeMessage, ErrorMessage } from './ChatMessage';
+import ChatMessage, { LoadingIndicator, StreamingIndicator, WelcomeMessage, ErrorMessage } from './ChatMessage';
 import TextSelectionHandler from './TextSelectionHandler';
-import { createSession, sendMessage } from './api';
+import { createSession, sendMessage, sendMessageStreaming } from './api';
+
+// Enable streaming by default (can be toggled for debugging)
+const USE_STREAMING = true;
 
 // Storage key for session persistence
 const SESSION_STORAGE_KEY = 'ai_book_chat_session';
@@ -20,6 +23,8 @@ export default function ChatWidget() {
   const [sessionId, setSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingContent, setStreamingContent] = useState('');
   const [error, setError] = useState(null);
 
   // Selected text context
@@ -35,7 +40,7 @@ export default function ChatWidget() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading, scrollToBottom]);
+  }, [messages, isLoading, isStreaming, streamingContent, scrollToBottom]);
 
   // Initialize or restore session
   useEffect(() => {
@@ -77,7 +82,7 @@ export default function ChatWidget() {
   // Handle sending a message
   const handleSend = async () => {
     const message = inputValue.trim();
-    if (!message || isLoading) return;
+    if (!message || isLoading || isStreaming) return;
 
     // Clear input
     setInputValue('');
@@ -96,31 +101,89 @@ export default function ChatWidget() {
     const contextText = selectedText;
     setSelectedText(null);
 
-    setIsLoading(true);
+    // Ensure we have a session
+    const currentSessionId = await ensureSession();
+    if (!currentSessionId) {
+      return;
+    }
 
-    try {
-      // Ensure we have a session
-      const currentSessionId = await ensureSession();
-      if (!currentSessionId) {
-        setIsLoading(false);
-        return;
+    if (USE_STREAMING) {
+      // Use streaming API
+      setIsStreaming(true);
+      setStreamingContent('');
+
+      try {
+        await sendMessageStreaming(
+          currentSessionId,
+          message,
+          {
+            onToken: (token) => {
+              setStreamingContent((prev) => prev + token);
+            },
+            onDone: (data) => {
+              // Add completed assistant message
+              setMessages((prev) => [
+                ...prev,
+                {
+                  id: data.message_id,
+                  role: 'assistant',
+                  content: streamingContent + '', // Capture final content
+                },
+              ]);
+              setStreamingContent('');
+              setIsStreaming(false);
+            },
+            onError: (err) => {
+              console.error('Streaming error:', err);
+              setError(err.message || 'Failed to get response. Please try again.');
+              setStreamingContent('');
+              setIsStreaming(false);
+            },
+          },
+          contextText
+        );
+
+        // Handle case where stream completes without onDone being called
+        // (fallback in case SSE doesn't properly signal completion)
+        if (streamingContent) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `stream-${Date.now()}`,
+              role: 'assistant',
+              content: streamingContent,
+            },
+          ]);
+          setStreamingContent('');
+        }
+        setIsStreaming(false);
+      } catch (err) {
+        console.error('Failed to stream message:', err);
+        setError(err.message || 'Failed to get response. Please try again.');
+        setStreamingContent('');
+        setIsStreaming(false);
       }
+    } else {
+      // Use non-streaming API
+      setIsLoading(true);
 
-      // Send message to API
-      const response = await sendMessage(currentSessionId, message, contextText);
+      try {
+        // Send message to API
+        const response = await sendMessage(currentSessionId, message, contextText);
 
-      // Add assistant response
-      const assistantMessage = {
-        id: response.message_id,
-        role: 'assistant',
-        content: response.response,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (err) {
-      console.error('Failed to send message:', err);
-      setError(err.message || 'Failed to get response. Please try again.');
-    } finally {
-      setIsLoading(false);
+        // Add assistant response
+        const assistantMessage = {
+          id: response.message_id,
+          role: 'assistant',
+          content: response.response,
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+      } catch (err) {
+        console.error('Failed to send message:', err);
+        setError(err.message || 'Failed to get response. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -136,7 +199,7 @@ export default function ChatWidget() {
 
   // Handle Enter key
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && !e.shiftKey && !isStreaming) {
       e.preventDefault();
       handleSend();
     }
@@ -178,11 +241,26 @@ export default function ChatWidget() {
 
           {/* Messages area */}
           <div className={styles.messagesContainer}>
-            {messages.length === 0 && !isLoading && <WelcomeMessage />}
+            {messages.length === 0 && !isLoading && !isStreaming && <WelcomeMessage />}
 
             {messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} />
             ))}
+
+            {/* Show streaming content as it arrives */}
+            {isStreaming && streamingContent && (
+              <ChatMessage
+                message={{
+                  id: 'streaming',
+                  role: 'assistant',
+                  content: streamingContent,
+                }}
+                isStreaming
+              />
+            )}
+
+            {/* Show streaming indicator while waiting for first token */}
+            {isStreaming && !streamingContent && <StreamingIndicator />}
 
             {isLoading && <LoadingIndicator />}
 
@@ -242,12 +320,12 @@ export default function ChatWidget() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={isLoading}
+              disabled={isLoading || isStreaming}
             />
             <button
               className={styles.sendButton}
               onClick={handleSend}
-              disabled={!inputValue.trim() || isLoading}
+              disabled={!inputValue.trim() || isLoading || isStreaming}
               aria-label="Send message"
             >
               ➤
