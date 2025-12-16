@@ -16,12 +16,14 @@ async def health_check():
     Returns status of database, Qdrant, and Cohere connections.
     """
     # Check database connection
-    db_status = "connected" if await check_connection() else "disconnected"
+    db_connected = await check_connection()
+    db_status = "connected" if db_connected else "not_configured"
 
     # Note: For full health check, we could also ping Qdrant and Cohere
     # but keeping it simple for now to avoid unnecessary API calls
 
-    overall_status = "healthy" if db_status == "connected" else "unhealthy"
+    # API is healthy as long as it can respond - DB is optional for now
+    overall_status = "healthy"
 
     return HealthResponse(
         status=overall_status,

@@ -14,13 +14,14 @@ logger = logging.getLogger(__name__)
 _pool: Optional[asyncpg.Pool] = None
 
 
-async def init_db_pool() -> asyncpg.Pool:
+async def init_db_pool() -> Optional[asyncpg.Pool]:
     """Initialize the database connection pool"""
     global _pool
 
     database_url = os.getenv("NEON_DATABASE_URL")
     if not database_url:
-        raise ValueError("NEON_DATABASE_URL environment variable is required")
+        logger.warning("NEON_DATABASE_URL not set - database features disabled")
+        return None
 
     if _pool is None:
         logger.info("Creating database connection pool...")
@@ -45,7 +46,7 @@ async def close_db_pool():
         logger.info("Database connection pool closed")
 
 
-async def get_pool() -> asyncpg.Pool:
+async def get_pool() -> Optional[asyncpg.Pool]:
     """Get the current connection pool, initializing if needed"""
     global _pool
     if _pool is None:
@@ -57,6 +58,8 @@ async def get_pool() -> asyncpg.Pool:
 async def get_connection():
     """Context manager for getting a database connection from the pool"""
     pool = await get_pool()
+    if pool is None:
+        raise RuntimeError("Database not configured - NEON_DATABASE_URL not set")
     async with pool.acquire() as conn:
         yield conn
 
@@ -81,8 +84,11 @@ async def execute(query: str, *args):
 
 async def check_connection() -> bool:
     """Check if database connection is healthy"""
+    pool = await get_pool()
+    if pool is None:
+        return False  # DB not configured
     try:
-        async with get_connection() as conn:
+        async with pool.acquire() as conn:
             await conn.fetchval("SELECT 1")
         return True
     except Exception as e:
