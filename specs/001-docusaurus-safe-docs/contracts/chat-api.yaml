@@ -1,0 +1,526 @@
+openapi: 3.1.0
+info:
+  title: AI Native Book Chat API
+  description: |
+    RESTful API for the RAG-powered chatbot integrated with the Physical AI & Humanoid Robotics textbook.
+
+    ## Features
+    - Chat sessions for conversation persistence
+    - RAG-powered question answering
+    - Text selection context for focused responses
+    - Server-Sent Events (SSE) for streaming responses
+  version: 1.0.0
+  contact:
+    name: AI Native Book Team
+    url: https://github.com/Habibullahdevv/ai-native-book
+
+servers:
+  - url: https://api.example.com
+    description: Production server
+  - url: http://localhost:8000
+    description: Local development
+
+tags:
+  - name: Sessions
+    description: Chat session management
+  - name: Chat
+    description: Message and conversation endpoints
+  - name: Health
+    description: Service health checks
+
+paths:
+  /api/health:
+    get:
+      tags:
+        - Health
+      summary: Health check
+      description: Returns service health status and dependency connectivity
+      operationId: healthCheck
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: healthy
+                timestamp: "2025-12-16T10:00:00Z"
+                dependencies:
+                  qdrant: connected
+                  neon: connected
+                  cohere: connected
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+              example:
+                status: unhealthy
+                timestamp: "2025-12-16T10:00:00Z"
+                dependencies:
+                  qdrant: disconnected
+                  neon: connected
+                  cohere: connected
+
+  /api/sessions:
+    post:
+      tags:
+        - Sessions
+      summary: Create a new chat session
+      description: |
+        Creates a new chat session and returns the session ID.
+        Sessions are used to group related messages and maintain conversation context.
+      operationId: createSession
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSessionRequest'
+            example:
+              metadata:
+                source_page: "/docs/module1/intro"
+                user_agent: "Mozilla/5.0..."
+      responses:
+        '201':
+          description: Session created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResponse'
+              example:
+                id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                created_at: "2025-12-16T10:00:00Z"
+                updated_at: "2025-12-16T10:00:00Z"
+                metadata:
+                  source_page: "/docs/module1/intro"
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/sessions/{session_id}:
+    get:
+      tags:
+        - Sessions
+      summary: Get session with messages
+      description: Retrieves a session and all its messages in chronological order
+      operationId: getSession
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionWithMessages'
+              example:
+                session:
+                  id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                  created_at: "2025-12-16T10:00:00Z"
+                  updated_at: "2025-12-16T10:05:00Z"
+                  metadata: {}
+                messages:
+                  - id: "msg-1"
+                    session_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                    role: "user"
+                    content: "What is Physical AI?"
+                    selected_text: null
+                    metadata: {}
+                    created_at: "2025-12-16T10:00:00Z"
+                  - id: "msg-2"
+                    session_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                    role: "assistant"
+                    content: "Physical AI refers to..."
+                    selected_text: null
+                    metadata:
+                      tokens_used: 150
+                    created_at: "2025-12-16T10:00:02Z"
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /api/chat:
+    post:
+      tags:
+        - Chat
+      summary: Send a chat message (non-streaming)
+      description: |
+        Sends a message to the RAG agent and returns the complete response.
+        Use this endpoint when streaming is not required.
+
+        **Text Selection Context**: Optionally include `selected_text` to focus
+        the AI's response on a specific passage from the documentation.
+      operationId: sendMessage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            examples:
+              basic:
+                summary: Basic question
+                value:
+                  session_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                  message: "What is Physical AI?"
+              with_context:
+                summary: Question with selected text context
+                value:
+                  session_id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+                  message: "Can you explain this in simpler terms?"
+                  selected_text: "Physical AI represents the convergence of artificial intelligence with robotics, enabling machines to perceive, reason, and act in the physical world."
+      responses:
+        '200':
+          description: Message processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+              example:
+                message_id: "msg-123"
+                response: "Physical AI is a field that combines artificial intelligence with robotics..."
+                metadata:
+                  tokens_used: 180
+                  latency_ms: 1234
+                  sources:
+                    - "https://habibullahdevv.github.io/ai-native-book/docs/module1"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+
+  /api/chat/stream:
+    get:
+      tags:
+        - Chat
+      summary: Stream chat response (SSE)
+      description: |
+        Sends a message to the RAG agent and streams the response via Server-Sent Events.
+
+        **SSE Event Types**:
+        - `data: {"type": "token", "content": "..."}` - Streamed token
+        - `data: {"type": "done", "message_id": "..."}` - Stream complete
+        - `data: {"type": "error", "message": "..."}` - Error occurred
+
+        **Client Usage**:
+        ```javascript
+        const eventSource = new EventSource(
+          `/api/chat/stream?session_id=${sessionId}&message=${encodeURIComponent(message)}`
+        );
+        eventSource.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          // Handle token/done/error
+        };
+        ```
+      operationId: streamMessage
+      parameters:
+        - name: session_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The session ID for context
+        - name: message
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 10000
+          description: The user's message/question
+        - name: selected_text
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 5000
+          description: Optional text selection for context
+      responses:
+        '200':
+          description: SSE stream established
+          content:
+            text/event-stream:
+              schema:
+                type: string
+              example: |
+                data: {"type": "token", "content": "Physical "}
+
+                data: {"type": "token", "content": "AI "}
+
+                data: {"type": "token", "content": "is..."}
+
+                data: {"type": "done", "message_id": "msg-123"}
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+
+components:
+  schemas:
+    # Request Schemas
+    CreateSessionRequest:
+      type: object
+      properties:
+        metadata:
+          type: object
+          description: Optional metadata for the session
+          additionalProperties: true
+          example:
+            source_page: "/docs/module1"
+      additionalProperties: false
+
+    ChatRequest:
+      type: object
+      required:
+        - session_id
+        - message
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: The session ID to add the message to
+        message:
+          type: string
+          minLength: 1
+          maxLength: 10000
+          description: The user's message/question
+        selected_text:
+          type: string
+          maxLength: 5000
+          nullable: true
+          description: Optional user-selected text for context
+      additionalProperties: false
+
+    # Response Schemas
+    SessionResponse:
+      type: object
+      required:
+        - id
+        - created_at
+        - updated_at
+        - metadata
+      properties:
+        id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        metadata:
+          type: object
+          additionalProperties: true
+
+    MessageResponse:
+      type: object
+      required:
+        - id
+        - session_id
+        - role
+        - content
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        session_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum:
+            - user
+            - assistant
+            - system
+        content:
+          type: string
+        selected_text:
+          type: string
+          nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+        created_at:
+          type: string
+          format: date-time
+
+    SessionWithMessages:
+      type: object
+      required:
+        - session
+        - messages
+      properties:
+        session:
+          $ref: '#/components/schemas/SessionResponse'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageResponse'
+
+    ChatResponse:
+      type: object
+      required:
+        - message_id
+        - response
+      properties:
+        message_id:
+          type: string
+          format: uuid
+          description: ID of the created assistant message
+        response:
+          type: string
+          description: The AI-generated response
+        metadata:
+          type: object
+          properties:
+            tokens_used:
+              type: integer
+            latency_ms:
+              type: integer
+            sources:
+              type: array
+              items:
+                type: string
+                format: uri
+
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum:
+            - healthy
+            - unhealthy
+        timestamp:
+          type: string
+          format: date-time
+        dependencies:
+          type: object
+          properties:
+            qdrant:
+              type: string
+              enum:
+                - connected
+                - disconnected
+            neon:
+              type: string
+              enum:
+                - connected
+                - disconnected
+            cohere:
+              type: string
+              enum:
+                - connected
+                - disconnected
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Human-readable error message
+        detail:
+          type: string
+          description: Technical error details (debug mode only)
+        retry:
+          type: boolean
+          description: Whether the client should retry the request
+          default: false
+
+  parameters:
+    SessionId:
+      name: session_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: Unique session identifier
+
+  responses:
+    BadRequest:
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Message content is required"
+            retry: false
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Session not found"
+            retry: false
+
+    RateLimited:
+      description: Rate limit exceeded
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+          description: Seconds until rate limit resets
+        X-RateLimit-Limit:
+          schema:
+            type: integer
+          description: Request limit per window
+        X-RateLimit-Remaining:
+          schema:
+            type: integer
+          description: Remaining requests in window
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Rate limit exceeded. Please wait before retrying."
+            retry: true
+
+    ServiceUnavailable:
+      description: Service temporarily unavailable
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Our AI is busy. Please try again in a moment."
+            retry: true
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "An unexpected error occurred"
+            retry: true
+
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Optional API key for future authentication (not currently enforced)
