@@ -114,11 +114,18 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 
 # Import and register routes
-from .routes import health, sessions, chat
+from .routes import health
 
 app.include_router(health.router, prefix="/api", tags=["Health"])
-app.include_router(sessions.router, prefix="/api", tags=["Sessions"])
-app.include_router(chat.router, prefix="/api", tags=["Chat"])
+
+# Only register DB-dependent routes if database is configured
+if os.getenv("NEON_DATABASE_URL"):
+    from .routes import sessions, chat
+    app.include_router(sessions.router, prefix="/api", tags=["Sessions"])
+    app.include_router(chat.router, prefix="/api", tags=["Chat"])
+    logger.info("Database routes enabled")
+else:
+    logger.warning("Database routes disabled - NEON_DATABASE_URL not set")
 
 
 @app.get("/")
