@@ -1,0 +1,28 @@
+# RAG Chatbot API Dependencies
+# FastAPI web framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+
+# Database (Neon Postgres)
+asyncpg>=0.29.0
+psycopg2-binary>=2.9.9
+
+# Environment configuration
+python-dotenv>=1.0.0
+
+# Rate limiting
+slowapi>=0.1.9
+
+# Existing RAG dependencies
+agents>=1.4.0
+cohere>=5.20.0
+qdrant-client>=1.16.1
+requests>=2.32.5
+trafilatura>=2.0.0
+
+# CORS and validation
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+
+# Logging
+structlog>=23.2.0

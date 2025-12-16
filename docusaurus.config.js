@@ -31,6 +31,11 @@ const config = {
     locales: ['en'],
   },
 
+  // Client modules - inject ChatWidget on all pages
+  clientModules: [
+    require.resolve('./src/clientModules/chatWidget.js'),
+  ],
+
   presets: [
     [
       'classic',
