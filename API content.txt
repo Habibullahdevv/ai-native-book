@@ -1,0 +1,11 @@
+bonsai start claude
+ccr code (if i have claude code router tehn i use ccr code,,, wesa qwen intall kr ke bhi hm claude use kr sakte hein wo bhi hme wasy and unpaid prega )
+
+FOR QWEN cli use install qwen globally then
+check its version, 
+write qwen in PS to start qwen, 
+/auth,
+go with qwen with auth
+go to qwen folder open oauth file 
+copy access token
+then go to claude code router folder that has qwen json code in it and paste the access token there
