@@ -178,8 +178,8 @@
 - [x] T054 [P] Create docker-compose.yml for local full-stack testing in `docker-compose.yml`
 - [x] T055 [P] Update .gitignore to exclude .env files but include .env.example
 - [x] T056 [P] Add CORS production origin (habibullahdevv.github.io) in `backend/api/main.py`
-- [ ] T057 Run quickstart.md validation: test local setup steps in `specs/001-docusaurus-safe-docs/quickstart.md`
-- [ ] T058 Verify GitHub Pages compatibility: build frontend with production API URL
+- [x] T057 Run quickstart.md validation: test local setup steps in `specs/001-docusaurus-safe-docs/quickstart.md`
+- [x] T058 Verify GitHub Pages compatibility: build frontend with production API URL
 - [x] T059 Add logging for debugging (structured JSON logs) in `backend/api/main.py`
 - [x] T060 Security review: verify no hardcoded credentials in any file
 

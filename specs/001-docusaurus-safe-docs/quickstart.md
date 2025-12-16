@@ -172,10 +172,18 @@ npm install
 
 Create `.env.local` in repository root:
 
-```env
-# Backend API URL
-REACT_APP_API_URL=http://localhost:8000
+```bash
+cp .env.local.example .env.local
 ```
+
+Edit `.env.local` with your backend URL:
+
+```env
+# Backend API URL (used at build time)
+CHAT_API_URL=http://localhost:8000
+```
+
+> **Note**: For local development, the default `http://localhost:8000` works without any configuration.
 
 ### 3.3 Start Development Server
 
@@ -194,7 +202,26 @@ npm run serve  # Preview production build
 
 ---
 
-## 4. Development Workflow
+## 4. Docker Compose Setup (Alternative)
+
+For running the full stack with Docker:
+
+```bash
+# From repository root
+# 1. Copy environment files
+cp backend/.env.example backend/.env
+# Edit backend/.env with your credentials
+
+# 2. Start all services
+docker-compose up --build
+
+# Backend: http://localhost:8000
+# Frontend: http://localhost:3000
+```
+
+---
+
+## 5. Development Workflow
 
 ### Backend Changes
 
@@ -235,7 +262,7 @@ npm run build
 
 ---
 
-## 5. Common Issues
+## 6. Common Issues
 
 ### Issue: CORS errors in browser
 
@@ -297,7 +324,7 @@ uvicorn api.main:app --port 8001
 
 ---
 
-## 6. Project Structure Reference
+## 7. Project Structure Reference
 
 ```
 ai-native-book/
@@ -326,7 +353,10 @@ ai-native-book/
 │   │   └── ChatWidget/
 │   │       ├── index.js
 │   │       ├── ChatWidget.js
-│   │       └── ChatWidget.module.css
+│   │       ├── ChatWidget.module.css
+│   │       ├── ChatMessage.js
+│   │       ├── TextSelectionHandler.js
+│   │       └── api.js
 │   ├── clientModules/
 │   │   └── chatWidget.js
 │   └── css/
@@ -340,7 +370,7 @@ ai-native-book/
 
 ---
 
-## 7. API Documentation
+## 8. API Documentation
 
 Once the backend is running, access interactive API docs:
 
@@ -350,7 +380,7 @@ Once the backend is running, access interactive API docs:
 
 ---
 
-## 8. Useful Commands
+## 9. Useful Commands
 
 ```bash
 # Backend
