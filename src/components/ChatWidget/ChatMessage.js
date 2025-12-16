@@ -4,7 +4,7 @@
 import React from 'react';
 import styles from './ChatWidget.module.css';
 
-export default function ChatMessage({ message }) {
+export default function ChatMessage({ message, isStreaming = false }) {
   const { role, content, selected_text } = message;
   const isUser = role === 'user';
 
@@ -17,7 +17,11 @@ export default function ChatMessage({ message }) {
           <span className={styles.selectedTextContent}>"{selected_text}"</span>
         </div>
       )}
-      <div>{content}</div>
+      <div>
+        {content}
+        {/* Show cursor for streaming messages */}
+        {isStreaming && <span className={styles.streamingCursor}>|</span>}
+      </div>
     </div>
   );
 }
@@ -32,6 +36,26 @@ export function LoadingIndicator() {
         <span></span>
         <span></span>
         <span></span>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Streaming indicator component - shown while waiting for first token
+ */
+export function StreamingIndicator() {
+  return (
+    <div className={`${styles.message} ${styles.assistantMessage}`}>
+      <div className={styles.streamingIndicator}>
+        <span className={styles.typingDots}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span style={{ marginLeft: '8px', fontSize: '12px', opacity: 0.7 }}>
+          Thinking...
+        </span>
       </div>
     </div>
   );

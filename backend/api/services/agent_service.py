@@ -5,11 +5,12 @@ Wraps the existing agent.py with async support and context injection
 import os
 import logging
 import asyncio
-from typing import Optional
+from typing import Optional, AsyncGenerator
 from dotenv import load_dotenv
 
 from agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI
 from agents import set_tracing_disabled, function_tool
+from agents.stream_events import RawResponsesStreamEvent, RunItemStreamEvent
 import cohere
 from qdrant_client import QdrantClient
 
@@ -192,6 +193,54 @@ def run_agent_sync(
     Use this for testing or when async is not available.
     """
     return asyncio.run(run_agent(query, selected_text, session_id))
+
+
+async def run_agent_streamed(
+    query: str,
+    selected_text: Optional[str] = None,
+    session_id: Optional[str] = None
+) -> AsyncGenerator[str, None]:
+    """
+    Run the RAG agent with streaming response.
+
+    Args:
+        query: The user's question
+        selected_text: Optional selected text context
+        session_id: Optional session ID for tracking
+
+    Yields:
+        String tokens as they are generated
+    """
+    logger.info(f"Running streamed agent for session {session_id}: {query[:50]}...")
+
+    try:
+        agent = _create_agent(selected_text)
+
+        # Run the agent with streaming
+        result = Runner.run_streamed(agent, input=query)
+
+        full_response = ""
+        async for event in result.stream_events():
+            # Handle raw response stream events (tokens)
+            if isinstance(event, RawResponsesStreamEvent):
+                # Extract text delta from the event
+                if hasattr(event, 'data') and hasattr(event.data, 'choices'):
+                    for choice in event.data.choices:
+                        if hasattr(choice, 'delta') and hasattr(choice.delta, 'content'):
+                            token = choice.delta.content
+                            if token:
+                                full_response += token
+                                yield token
+
+        logger.info(f"Streamed agent response completed for session {session_id}")
+
+        # If no tokens were yielded, provide a fallback
+        if not full_response or len(full_response.strip()) < 10:
+            yield "I don't know based on the textbook content."
+
+    except Exception as e:
+        logger.error(f"Streaming agent error: {e}")
+        yield f"Error generating response: {str(e)}"
 
 
 # Check if service is properly initialized

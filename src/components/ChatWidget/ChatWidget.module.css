@@ -294,6 +294,32 @@
   }
 }
 
+/* Streaming cursor */
+.streamingCursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--ifm-color-primary);
+  margin-left: 2px;
+  animation: blink 1s infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+/* Streaming indicator */
+.streamingIndicator {
+  display: flex;
+  align-items: center;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .chatPanel {

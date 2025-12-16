@@ -1,0 +1,58 @@
+# Docker Compose for local full-stack development
+# Usage: docker-compose up
+
+version: '3.8'
+
+services:
+  # Backend API (FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # OpenAI API key for agent
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      # Cohere for embeddings
+      - COHERE_API_KEY=${COHERE_API_KEY}
+      # Qdrant vector database
+      - QDRANT_URL=${QDRANT_URL}
+      - QDRANT_API_KEY=${QDRANT_API_KEY}
+      - QDRANT_COLLECTION=${QDRANT_COLLECTION:-Ai_Native_Book}
+      # Neon Postgres for chat sessions
+      - DATABASE_URL=${DATABASE_URL}
+      # CORS - allow frontend
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:8000
+      # Rate limiting
+      - RATE_LIMIT_REQUESTS=${RATE_LIMIT_REQUESTS:-20}
+      - RATE_LIMIT_WINDOW=${RATE_LIMIT_WINDOW:-60}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  # Frontend (Docusaurus) - development server
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - CHAT_API_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    volumes:
+      # Mount source for hot reloading in development
+      - ./docs:/app/docs:ro
+      - ./src:/app/src:ro
+    restart: unless-stopped
+
+# Note: For production, use separate deployments:
+# - Backend: Railway or similar PaaS
+# - Frontend: GitHub Pages (static build)
