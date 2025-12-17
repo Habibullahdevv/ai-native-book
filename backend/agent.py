@@ -1,6 +1,6 @@
 """
 RAG Agent for Physical AI & Humanoid Robotics Textbook
-Uses OpenAI Agents SDK with Gemini 2.0 Flash and Qdrant vector search
+Uses OpenAI Agents SDK with Gemini and Qdrant vector search
 """
 from agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI
 from agents import set_tracing_disabled, function_tool
@@ -24,7 +24,7 @@ provider = AsyncOpenAI(
 )
 
 model = OpenAIChatCompletionsModel(
-    model="gemini-2.0-flash",
+    model="gemini-1.5-flash-latest",
     openai_client=provider
 )
 

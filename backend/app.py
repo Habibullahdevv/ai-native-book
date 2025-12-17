@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 
 import cohere
 from qdrant_client import QdrantClient
+from openai import OpenAI
 
 # Load environment variables
 load_dotenv()
@@ -48,7 +49,7 @@ _cohere_api_key = os.getenv("COHERE_API_KEY")
 _qdrant_url = os.getenv("QDRANT_URL")
 _qdrant_api_key = os.getenv("QDRANT_API_KEY")
 _qdrant_collection = os.getenv("QDRANT_COLLECTION", "Ai_Native_Book")
-_gemini_api_key = os.getenv("GEMINI_API_KEY")
+_xai_api_key = os.getenv("XAI_API_KEY")
 
 # Cohere client for embeddings
 _cohere_client = None
@@ -66,23 +67,16 @@ if _qdrant_url and _qdrant_api_key:
 else:
     logger.warning("QDRANT_URL or QDRANT_API_KEY not set")
 
-# Gemini client for chat
-_gemini_client = None
-if _gemini_api_key:
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=_gemini_api_key)
-        _gemini_client = genai.GenerativeModel('gemini-2.0-flash')
-        logger.info("Gemini client initialized")
-    except ImportError:
-        logger.warning("google-generativeai not installed, trying OpenAI-compatible client")
-        from openai import OpenAI
-        _gemini_client = OpenAI(
-            api_key=_gemini_api_key,
-            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-        )
+# Grok (xAI) client for chat
+_grok_client = None
+if _xai_api_key:
+    _grok_client = OpenAI(
+        api_key=_xai_api_key,
+        base_url="https://api.x.ai/v1"
+    )
+    logger.info("Grok (xAI) client initialized")
 else:
-    logger.warning("GEMINI_API_KEY not set")
+    logger.warning("XAI_API_KEY not set")
 
 
 # Pydantic models
@@ -141,9 +135,9 @@ def retrieve_context(query: str, limit: int = 5) -> list[dict]:
 
 
 def generate_response(query: str, contexts: list[dict], selected_text: Optional[str] = None) -> str:
-    """Generate response using Gemini"""
-    if not _gemini_client:
-        raise RuntimeError("Gemini client not initialized")
+    """Generate response using Grok (xAI)"""
+    if not _grok_client:
+        raise RuntimeError("Grok client not initialized")
 
     # Build context string
     context_text = "\n\n".join([f"Source: {c['url']}\n{c['text']}" for c in contexts])
@@ -179,21 +173,19 @@ User question: {query}
 Answer based ONLY on the retrieved content above. Be concise and accurate. If the answer is not in the provided content, say "I don't know based on the textbook content."
 """
 
-    # Generate with Gemini
+    # Generate with Grok
     try:
-        # Try google-generativeai SDK first
-        if hasattr(_gemini_client, 'generate_content'):
-            response = _gemini_client.generate_content(prompt)
-            return response.text
-        else:
-            # OpenAI-compatible client
-            response = _gemini_client.chat.completions.create(
-                model="gemini-2.0-flash",
-                messages=[{"role": "user", "content": prompt}]
-            )
-            return response.choices[0].message.content
+        response = _grok_client.chat.completions.create(
+            model="grok-3-latest",
+            messages=[
+                {"role": "system", "content": "You are an AI tutor for the Physical AI & Humanoid Robotics textbook. Be concise and accurate."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7
+        )
+        return response.choices[0].message.content
     except Exception as e:
-        logger.error(f"Gemini generation error: {e}")
+        logger.error(f"Grok generation error: {e}")
         raise RuntimeError(f"Failed to generate response: {str(e)}")
 
 
@@ -218,7 +210,7 @@ async def health_check():
         services={
             "cohere": "connected" if _cohere_client else "not_configured",
             "qdrant": "connected" if _qdrant else "not_configured",
-            "gemini": "connected" if _gemini_client else "not_configured"
+            "grok": "connected" if _grok_client else "not_configured"
         }
     )
 
@@ -236,8 +228,8 @@ async def chat(request: SimpleChatRequest):
         raise HTTPException(status_code=503, detail="Cohere service not configured")
     if not _qdrant:
         raise HTTPException(status_code=503, detail="Qdrant service not configured")
-    if not _gemini_client:
-        raise HTTPException(status_code=503, detail="Gemini service not configured")
+    if not _grok_client:
+        raise HTTPException(status_code=503, detail="Grok service not configured")
 
     try:
         logger.info(f"Processing chat: {request.message[:50]}...")
@@ -275,3 +267,4 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 7860))
     uvicorn.run(app, host="0.0.0.0", port=port)
+
