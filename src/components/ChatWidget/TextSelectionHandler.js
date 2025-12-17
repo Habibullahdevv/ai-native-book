@@ -50,21 +50,17 @@ export default function TextSelectionHandler({ onAskAboutSelection }) {
     // Listen for mouse up (selection complete)
     document.addEventListener('mouseup', debouncedHandler);
 
-    // Clear selection on scroll or click elsewhere
-    const clearSelection = (e) => {
-      // Don't clear if clicking the Ask AI button
-      if (e.target.closest(`.${styles.askAiButton}`)) {
-        return;
-      }
+    // Clear selection on scroll
+    const clearSelection = () => {
       setSelection(null);
       setButtonPosition(null);
     };
 
-    document.addEventListener('scroll', clearSelection, true);
+    document.addEventListener('scroll', clearSelection, { passive: true });
 
     return () => {
       document.removeEventListener('mouseup', debouncedHandler);
-      document.removeEventListener('scroll', clearSelection, true);
+      document.removeEventListener('scroll', clearSelection);
       clearTimeout(timeoutId);
     };
   }, [handleSelection]);

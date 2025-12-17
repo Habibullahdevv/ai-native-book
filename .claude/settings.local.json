@@ -31,7 +31,10 @@
       "Bash(CHAT_API_URL=\"https://ai-native-book-api.railway.app\" npm run build:*)",
       "Bash(node --version)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(npm start)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

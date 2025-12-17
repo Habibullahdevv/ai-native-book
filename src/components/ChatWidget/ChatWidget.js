@@ -4,15 +4,9 @@
  */
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './ChatWidget.module.css';
-import ChatMessage, { LoadingIndicator, StreamingIndicator, WelcomeMessage, ErrorMessage } from './ChatMessage';
+import ChatMessage, { LoadingIndicator, WelcomeMessage, ErrorMessage } from './ChatMessage';
 import TextSelectionHandler from './TextSelectionHandler';
-import { createSession, sendMessage, sendMessageStreaming } from './api';
-
-// Enable streaming by default (can be toggled for debugging)
-const USE_STREAMING = true;
-
-// Storage key for session persistence
-const SESSION_STORAGE_KEY = 'ai_book_chat_session';
+import { sendMessage } from './api';
 
 export default function ChatWidget() {
   // UI State
@@ -20,11 +14,8 @@ export default function ChatWidget() {
   const [inputValue, setInputValue] = useState('');
 
   // Chat State
-  const [sessionId, setSessionId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [streamingContent, setStreamingContent] = useState('');
   const [error, setError] = useState(null);
 
   // Selected text context
@@ -40,49 +31,12 @@ export default function ChatWidget() {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading, isStreaming, streamingContent, scrollToBottom]);
-
-  // Initialize or restore session
-  useEffect(() => {
-    const initSession = async () => {
-      // Try to restore session from storage
-      const storedSessionId = localStorage.getItem(SESSION_STORAGE_KEY);
-
-      if (storedSessionId) {
-        setSessionId(storedSessionId);
-      } else {
-        // Create new session when widget first opens
-        // We'll defer this until the user actually opens the chat
-      }
-    };
-
-    initSession();
-  }, []);
-
-  // Create session when chat is opened for the first time
-  const ensureSession = async () => {
-    if (sessionId) return sessionId;
-
-    try {
-      const session = await createSession({
-        source: window.location.pathname,
-        user_agent: navigator.userAgent,
-      });
-      const newSessionId = session.id;
-      setSessionId(newSessionId);
-      localStorage.setItem(SESSION_STORAGE_KEY, newSessionId);
-      return newSessionId;
-    } catch (err) {
-      console.error('Failed to create session:', err);
-      setError('Could not connect to chat service. Please try again.');
-      return null;
-    }
-  };
+  }, [messages, isLoading, scrollToBottom]);
 
   // Handle sending a message
   const handleSend = async () => {
     const message = inputValue.trim();
-    if (!message || isLoading || isStreaming) return;
+    if (!message || isLoading) return;
 
     // Clear input
     setInputValue('');
@@ -101,89 +55,25 @@ export default function ChatWidget() {
     const contextText = selectedText;
     setSelectedText(null);
 
-    // Ensure we have a session
-    const currentSessionId = await ensureSession();
-    if (!currentSessionId) {
-      return;
-    }
+    setIsLoading(true);
 
-    if (USE_STREAMING) {
-      // Use streaming API
-      setIsStreaming(true);
-      setStreamingContent('');
+    try {
+      // Send message to API
+      const response = await sendMessage(message, contextText);
 
-      try {
-        await sendMessageStreaming(
-          currentSessionId,
-          message,
-          {
-            onToken: (token) => {
-              setStreamingContent((prev) => prev + token);
-            },
-            onDone: (data) => {
-              // Add completed assistant message
-              setMessages((prev) => [
-                ...prev,
-                {
-                  id: data.message_id,
-                  role: 'assistant',
-                  content: streamingContent + '', // Capture final content
-                },
-              ]);
-              setStreamingContent('');
-              setIsStreaming(false);
-            },
-            onError: (err) => {
-              console.error('Streaming error:', err);
-              setError(err.message || 'Failed to get response. Please try again.');
-              setStreamingContent('');
-              setIsStreaming(false);
-            },
-          },
-          contextText
-        );
-
-        // Handle case where stream completes without onDone being called
-        // (fallback in case SSE doesn't properly signal completion)
-        if (streamingContent) {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: `stream-${Date.now()}`,
-              role: 'assistant',
-              content: streamingContent,
-            },
-          ]);
-          setStreamingContent('');
-        }
-        setIsStreaming(false);
-      } catch (err) {
-        console.error('Failed to stream message:', err);
-        setError(err.message || 'Failed to get response. Please try again.');
-        setStreamingContent('');
-        setIsStreaming(false);
-      }
-    } else {
-      // Use non-streaming API
-      setIsLoading(true);
-
-      try {
-        // Send message to API
-        const response = await sendMessage(currentSessionId, message, contextText);
-
-        // Add assistant response
-        const assistantMessage = {
-          id: response.message_id,
-          role: 'assistant',
-          content: response.response,
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
-      } catch (err) {
-        console.error('Failed to send message:', err);
-        setError(err.message || 'Failed to get response. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
+      // Add assistant response
+      const assistantMessage = {
+        id: response.id || Date.now() + 1,
+        role: 'assistant',
+        content: response.response,
+        sources: response.sources || [],
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error('Failed to send message:', err);
+      setError(err.message || 'Failed to get response. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -199,7 +89,7 @@ export default function ChatWidget() {
 
   // Handle Enter key
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey && !isStreaming) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -241,26 +131,11 @@ export default function ChatWidget() {
 
           {/* Messages area */}
           <div className={styles.messagesContainer}>
-            {messages.length === 0 && !isLoading && !isStreaming && <WelcomeMessage />}
+            {messages.length === 0 && !isLoading && <WelcomeMessage />}
 
             {messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} />
             ))}
-
-            {/* Show streaming content as it arrives */}
-            {isStreaming && streamingContent && (
-              <ChatMessage
-                message={{
-                  id: 'streaming',
-                  role: 'assistant',
-                  content: streamingContent,
-                }}
-                isStreaming
-              />
-            )}
-
-            {/* Show streaming indicator while waiting for first token */}
-            {isStreaming && !streamingContent && <StreamingIndicator />}
 
             {isLoading && <LoadingIndicator />}
 
@@ -269,7 +144,6 @@ export default function ChatWidget() {
                 message={error}
                 onRetry={() => {
                   setError(null);
-                  handleSend();
                 }}
               />
             )}
@@ -279,29 +153,11 @@ export default function ChatWidget() {
 
           {/* Selected text context indicator */}
           {selectedText && (
-            <div
-              style={{
-                padding: '8px 16px',
-                background: 'var(--ifm-color-emphasis-100)',
-                borderTop: '1px solid var(--ifm-color-emphasis-200)',
-                fontSize: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
+            <div className={styles.contextIndicator}>
               <span>
-                <strong>Context:</strong> "{selectedText.substring(0, 50)}..."
+                <strong>Context:</strong> "{selectedText.length > 50 ? selectedText.substring(0, 50) + '...' : selectedText}"
               </span>
-              <button
-                onClick={clearSelectedText}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--ifm-color-danger)',
-                }}
-              >
+              <button onClick={clearSelectedText} aria-label="Clear context">
                 ✕
               </button>
             </div>
@@ -320,12 +176,12 @@ export default function ChatWidget() {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={isLoading || isStreaming}
+              disabled={isLoading}
             />
             <button
               className={styles.sendButton}
               onClick={handleSend}
-              disabled={!inputValue.trim() || isLoading || isStreaming}
+              disabled={!inputValue.trim() || isLoading}
               aria-label="Send message"
             >
               ➤

@@ -26,7 +26,7 @@ const config = {
   // Custom fields for runtime configuration
   customFields: {
     // Chat API URL - override via environment variable for production
-    chatApiUrl: process.env.CHAT_API_URL || 'http://localhost:8000',
+    chatApiUrl: process.env.CHAT_API_URL || 'https://habibullahio-ai-native-book-api.hf.space',
   },
 
   // Even if you don't use internationalization, you can use this field to set
