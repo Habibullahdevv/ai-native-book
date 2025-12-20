@@ -71,7 +71,7 @@ else:
 _gemini_model = None
 if _gemini_api_key:
     genai.configure(api_key=_gemini_api_key)
-    _gemini_model = genai.GenerativeModel("gemini-1.5-flash")
+    _gemini_model = genai.GenerativeModel("gemini-2.0-flash")
     logger.info("Gemini client initialized")
 else:
     logger.warning("GEMINI_API_KEY not set")
