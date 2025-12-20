@@ -1,9 +1,10 @@
 /**
  * API client for the RAG Chatbot backend
+ * Simplified version matching the backend API
  */
 
-// Default API URL for development
-const DEFAULT_API_URL = 'http://localhost:8000';
+// Default API URL - use HuggingFace Space
+const DEFAULT_API_URL = 'https://habibullahio-ai-native-book-api.hf.space';
 
 /**
  * Get the API base URL from Docusaurus config or fallback
@@ -27,61 +28,13 @@ function getApiBaseUrl() {
 const getUrl = () => getApiBaseUrl();
 
 /**
- * Create a new chat session
- * @param {Object} metadata - Optional session metadata
- * @returns {Promise<Object>} Session object with id
- */
-export async function createSession(metadata = {}) {
-  const response = await fetch(`${getUrl()}/api/sessions`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ metadata }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || 'Failed to create session');
-  }
-
-  return response.json();
-}
-
-/**
- * Get session with messages
- * @param {string} sessionId - Session UUID
- * @returns {Promise<Object>} Session with messages array
- */
-export async function getSession(sessionId) {
-  const response = await fetch(`${getUrl()}/api/sessions/${sessionId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      return null;
-    }
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || 'Failed to get session');
-  }
-
-  return response.json();
-}
-
-/**
  * Send a chat message and get response
- * @param {string} sessionId - Session UUID
  * @param {string} message - User's message
  * @param {string|null} selectedText - Optional selected text context
- * @returns {Promise<Object>} Response with message_id and response text
+ * @returns {Promise<Object>} Response with id, response, sources, timestamp
  */
-export async function sendMessage(sessionId, message, selectedText = null) {
+export async function sendMessage(message, selectedText = null) {
   const body = {
-    session_id: sessionId,
     message,
   };
 
@@ -89,20 +42,31 @@ export async function sendMessage(sessionId, message, selectedText = null) {
     body.selected_text = selectedText;
   }
 
-  const response = await fetch(`${getUrl()}/api/chat`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
+  const apiUrl = getUrl();
+  console.log('Sending message to:', `${apiUrl}/api/chat`);
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.error || 'Failed to send message');
+  try {
+    const response = await fetch(`${apiUrl}/api/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || error.error || 'Failed to send message');
+    }
+
+    return response.json();
+  } catch (err) {
+    console.error('API Error:', err);
+    if (err.message === 'Failed to fetch') {
+      throw new Error('Cannot connect to chat server. Please check your internet connection.');
+    }
+    throw err;
   }
-
-  return response.json();
 }
 
 /**
@@ -131,97 +95,5 @@ export async function checkHealth() {
 export function setApiUrl(url) {
   if (typeof window !== 'undefined') {
     window.__CHAT_API_URL__ = url;
-  }
-}
-
-/**
- * Send a chat message and stream the response via SSE
- * @param {string} sessionId - Session UUID
- * @param {string} message - User's message
- * @param {Object} callbacks - Callback functions for streaming events
- * @param {Function} callbacks.onToken - Called for each token received
- * @param {Function} callbacks.onDone - Called when stream completes
- * @param {Function} callbacks.onError - Called on error
- * @param {string|null} selectedText - Optional selected text context
- * @returns {Promise<void>}
- */
-export async function sendMessageStreaming(
-  sessionId,
-  message,
-  { onToken, onDone, onError },
-  selectedText = null
-) {
-  const body = {
-    session_id: sessionId,
-    message,
-  };
-
-  if (selectedText) {
-    body.selected_text = selectedText;
-  }
-
-  try {
-    const response = await fetch(`${getUrl()}/api/chat/stream`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(error.detail || error.error || 'Failed to stream message');
-    }
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-
-      if (done) {
-        break;
-      }
-
-      buffer += decoder.decode(value, { stream: true });
-
-      // Process complete SSE events (each ends with \n\n)
-      const events = buffer.split('\n\n');
-      buffer = events.pop() || ''; // Keep incomplete event in buffer
-
-      for (const event of events) {
-        if (!event.trim()) continue;
-
-        // Parse SSE data line
-        const dataMatch = event.match(/^data: (.+)$/m);
-        if (!dataMatch) continue;
-
-        try {
-          const data = JSON.parse(dataMatch[1]);
-
-          switch (data.type) {
-            case 'token':
-              if (onToken) onToken(data.content);
-              break;
-            case 'done':
-              if (onDone) onDone(data);
-              return;
-            case 'error':
-              if (onError) onError(new Error(data.error));
-              return;
-          }
-        } catch (parseError) {
-          console.error('Failed to parse SSE event:', parseError);
-        }
-      }
-    }
-  } catch (error) {
-    if (onError) {
-      onError(error);
-    } else {
-      throw error;
-    }
   }
 }

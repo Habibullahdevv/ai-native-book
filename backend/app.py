@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 
 import cohere
 from qdrant_client import QdrantClient
+import google.generativeai as genai
 
 # Load environment variables
 load_dotenv()
@@ -67,20 +68,11 @@ else:
     logger.warning("QDRANT_URL or QDRANT_API_KEY not set")
 
 # Gemini client for chat
-_gemini_client = None
+_gemini_model = None
 if _gemini_api_key:
-    try:
-        import google.generativeai as genai
-        genai.configure(api_key=_gemini_api_key)
-        _gemini_client = genai.GenerativeModel('gemini-2.0-flash')
-        logger.info("Gemini client initialized")
-    except ImportError:
-        logger.warning("google-generativeai not installed, trying OpenAI-compatible client")
-        from openai import OpenAI
-        _gemini_client = OpenAI(
-            api_key=_gemini_api_key,
-            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-        )
+    genai.configure(api_key=_gemini_api_key)
+    _gemini_model = genai.GenerativeModel("gemini-2.0-flash")
+    logger.info("Gemini client initialized")
 else:
     logger.warning("GEMINI_API_KEY not set")
 
@@ -141,16 +133,18 @@ def retrieve_context(query: str, limit: int = 5) -> list[dict]:
 
 
 def generate_response(query: str, contexts: list[dict], selected_text: Optional[str] = None) -> str:
-    """Generate response using Gemini"""
-    if not _gemini_client:
+    """Generate response using Google Gemini"""
+    if not _gemini_model:
         raise RuntimeError("Gemini client not initialized")
 
     # Build context string
     context_text = "\n\n".join([f"Source: {c['url']}\n{c['text']}" for c in contexts])
 
     # Build prompt
+    system_instruction = "You are an AI tutor for the Physical AI & Humanoid Robotics textbook. Be concise and accurate."
+
     if selected_text:
-        prompt = f"""You are an AI tutor for the Physical AI & Humanoid Robotics textbook.
+        prompt = f"""{system_instruction}
 
 The user has selected this text for context:
 ---
@@ -167,7 +161,7 @@ User question: {query}
 Answer based on the selected text and retrieved content. Be concise and accurate. If the answer is not in the provided content, say "I don't know based on the textbook content."
 """
     else:
-        prompt = f"""You are an AI tutor for the Physical AI & Humanoid Robotics textbook.
+        prompt = f"""{system_instruction}
 
 Relevant content from the textbook:
 ---
@@ -181,17 +175,13 @@ Answer based ONLY on the retrieved content above. Be concise and accurate. If th
 
     # Generate with Gemini
     try:
-        # Try google-generativeai SDK first
-        if hasattr(_gemini_client, 'generate_content'):
-            response = _gemini_client.generate_content(prompt)
-            return response.text
-        else:
-            # OpenAI-compatible client
-            response = _gemini_client.chat.completions.create(
-                model="gemini-2.0-flash",
-                messages=[{"role": "user", "content": prompt}]
+        response = _gemini_model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                temperature=0.7
             )
-            return response.choices[0].message.content
+        )
+        return response.text
     except Exception as e:
         logger.error(f"Gemini generation error: {e}")
         raise RuntimeError(f"Failed to generate response: {str(e)}")
@@ -218,7 +208,7 @@ async def health_check():
         services={
             "cohere": "connected" if _cohere_client else "not_configured",
             "qdrant": "connected" if _qdrant else "not_configured",
-            "gemini": "connected" if _gemini_client else "not_configured"
+            "gemini": "connected" if _gemini_model else "not_configured"
         }
     )
 
@@ -236,7 +226,7 @@ async def chat(request: SimpleChatRequest):
         raise HTTPException(status_code=503, detail="Cohere service not configured")
     if not _qdrant:
         raise HTTPException(status_code=503, detail="Qdrant service not configured")
-    if not _gemini_client:
+    if not _gemini_model:
         raise HTTPException(status_code=503, detail="Gemini service not configured")
 
     try:
@@ -275,3 +265,4 @@ if __name__ == "__main__":
     import uvicorn
     port = int(os.getenv("PORT", 7860))
     uvicorn.run(app, host="0.0.0.0", port=port)
+

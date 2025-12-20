@@ -4,8 +4,8 @@
 import React from 'react';
 import styles from './ChatWidget.module.css';
 
-export default function ChatMessage({ message, isStreaming = false }) {
-  const { role, content, selected_text } = message;
+export default function ChatMessage({ message }) {
+  const { role, content, selected_text, sources } = message;
   const isUser = role === 'user';
 
   return (
@@ -17,11 +17,16 @@ export default function ChatMessage({ message, isStreaming = false }) {
           <span className={styles.selectedTextContent}>"{selected_text}"</span>
         </div>
       )}
-      <div>
-        {content}
-        {/* Show cursor for streaming messages */}
-        {isStreaming && <span className={styles.streamingCursor}>|</span>}
-      </div>
+      <div>{content}</div>
+      {/* Show sources for assistant messages */}
+      {!isUser && sources && sources.length > 0 && (
+        <div className={styles.sources}>
+          <span className={styles.sourcesLabel}>Sources:</span>
+          {sources.map((source, idx) => (
+            <span key={idx} className={styles.sourceItem}>{source}</span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
